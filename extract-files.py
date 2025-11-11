@@ -83,6 +83,8 @@ lib_fixups: lib_fixups_user_type = {
 }
 
 blob_fixups: blob_fixups_user_type = {
+    'vendor/etc/sensors/hals.conf': blob_fixup()
+        .regex_replace(r'sensors\.qsh\.so', 'sensors.fusionlight.so'),
     'product/app/ConsumerIRApp/ConsumerIRApp.apk': blob_fixup()
         .call(blob_fixup_coui_unpack_sources)
         .call(blob_fixup_coui_material_capabilities)
