@@ -138,6 +138,21 @@ on property:sys.shutdown.requested=*
 on property:vold.decrypt=trigger_restart_framework
    start vendor.cnss_diag
 
+on property:persist.sys.haptic_profile=richtap
+    setprop persist.vendor.haptic_profile richtap
+
+on property:persist.sys.haptic_profile=crisp
+    setprop persist.vendor.haptic_profile crisp
+
+on property:persist.sys.haptic_profile=gentle
+    setprop persist.vendor.haptic_profile gentle
+
+on property:persist.sys.haptic_profile=op15def
+    setprop persist.vendor.haptic_profile op15def
+
+on property:persist.sys.haptic_profile=op15soft
+    setprop persist.vendor.haptic_profile op15soft
+
 service vendor.cnss_diag /system/vendor/bin/cnss_diag -q -f -t HELIUM
    class main
    user system
