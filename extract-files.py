@@ -101,7 +101,6 @@ blob_fixups: blob_fixups_user_type = {
         .replace_needed('libprotobuf-cpp-lite.so', 'libprotobuf-cpp-lite-21.12.so'),
     'system_ext/lib64/libwfdnative.so': blob_fixup()
         .add_needed('libinput_shim.so'),
-    # Inject Dolby Vision codec include into every non-vendor canoe variant.
     (
         'vendor/etc/media_codecs_canoe_sku1.xml',
         'vendor/etc/media_codecs_canoe_sku2.xml',
@@ -109,8 +108,7 @@ blob_fixups: blob_fixups_user_type = {
         'vendor/etc/media_codecs_canoe_v1.xml',
         'vendor/etc/media_codecs_canoe_v2.xml',
     ): blob_fixup()
-        .regex_replace('.*media_codecs_(google_audio|google_c2|google_telephony|google_video|vendor_audio).*\n', '')
-        .regex_replace(r'([ \t]*</MediaCodecs>)', r'    <Include href="media_codecs_dolby_vision.xml" />\n\1'),
+        .regex_replace('.*media_codecs_(google_audio|google_c2|google_telephony|google_video|vendor_audio).*\n', ''),
     (
         'vendor/lib64/hw/android.hardware.bluetooth.audio_sw.so',
         'vendor/lib64/hw/libaudiocorehal.default.so',
@@ -171,6 +169,17 @@ blob_fixups: blob_fixups_user_type = {
         'vendor/lib64/liblistensoundmodel2vendor.so',
     ): blob_fixup()
         .replace_needed('libtensorflowlite_c.so', 'libtensorflowlite_c_vendor.so'),
+    # Only the *_vendor.xml variants are parsed, so the Dolby Vision include
+    # has to go in there, otherwise video/dolby-vision is missing from
+    # MediaCodecList and HDR video recording fails to start.
+    (
+        'vendor/etc/media_codecs_canoe_sku1_vendor.xml',
+        'vendor/etc/media_codecs_canoe_sku2_vendor.xml',
+        'vendor/etc/media_codecs_canoe_sku3_vendor.xml',
+        'vendor/etc/media_codecs_canoe_v1_vendor.xml',
+        'vendor/etc/media_codecs_canoe_v2_vendor.xml',
+    ): blob_fixup()
+        .regex_replace(r'([ \t]*</MediaCodecs>)', r'    <Include href="media_codecs_dolby_vision.xml" />\n\1'),
     'vendor/etc/public.libraries.txt': blob_fixup()
         .add_line_if_missing('libarcsoft_hdr_couple_api.so')
         .add_line_if_missing('libarcsoft_high_dynamic_range_couple.so')
