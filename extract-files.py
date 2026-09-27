@@ -111,28 +111,12 @@ blob_fixups: blob_fixups_user_type = {
     ): blob_fixup()
         .regex_replace('.*media_codecs_(google_audio|google_c2|google_telephony|google_video|vendor_audio).*\n', '')
         .regex_replace(r'([ \t]*</MediaCodecs>)', r'    <Include href="media_codecs_dolby_vision.xml" />\n\1'),
-    (
-        'vendor/lib64/hw/android.hardware.bluetooth.audio_sw.so',
-        'vendor/lib64/hw/libaudiocorehal.default.so',
-        'vendor/lib64/hw/libaudiocorehal.qti.so',
-        'vendor/lib64/libaudioplatformconverter.qti.so',
-        'vendor/lib64/libaudioserviceexampleimpl.so',
-        'vendor/lib64/libqtigefar.so',
-        'vendor/lib64/libwfdmmsrc_proprietary.so',
-    ): blob_fixup()
-        .replace_needed('android.hardware.audio.core-V3-ndk.so', 'android.hardware.audio.core-V4-ndk.so'),
-    (
-        'vendor/lib64/hw/android.hardware.bluetooth.audio_sw.so',
-        'vendor/lib64/hw/libaudiocorehal.qti.so',
-        'vendor/lib64/hw/libaudioeffecthal.qti.so',
-        'vendor/lib64/libaudioserviceexampleimpl.so',
-        'vendor/lib64/libqtigefar.so',
-        'vendor/lib64/soundfx/libqcompostprocbundle.so',
-        'vendor/lib64/soundfx/libqcomvisualizer.so',
-        'vendor/lib64/soundfx/libqcomvoiceprocessing.so',
-        'vendor/lib64/soundfx/libvolumelistener.so',
-    ): blob_fixup()
-        .replace_needed('android.media.audio.common.types-V5-ndk.so', 'android.media.audio.common.types-V4-ndk.so'),
+    # Retain the stock audio core AIDL version (Jonas' 5709a47).
+    # This 16.0.8 Bluetooth blob imports only three AudioDeviceDescription
+    # constants exported by V4, which the stock audio.core-V3 also uses.
+    'vendor/lib64/hw/android.hardware.bluetooth.audio_sw.so': blob_fixup()
+        .replace_needed('android.media.audio.common.types-V5-ndk.so',
+                        'android.media.audio.common.types-V4-ndk.so'),
     'vendor/lib64/libaudioserviceexampleimpl.so': blob_fixup()
         .add_needed('libaudioutils_shim.so')
         .add_needed('libbluetooth_audio_session_aidl_shim.so'),
@@ -184,6 +168,23 @@ blob_fixups: blob_fixups_user_type = {
         .add_line_if_missing('libQnnGpu.so'),
     'vendor/usr/keylayout/gpio-keys.kl': blob_fixup()
         .add_line_if_missing('key 735   ASSIST'),
+    # Preserve the already verified Android 17 WFD compatibility fixes.
+    'system_ext/lib64/libwfdcommonutils.so': blob_fixup()
+        .remove_needed('libheif.so'),
+    'system_ext/lib64/libwfdmmsrc_system.so': blob_fixup()
+        .replace_needed('libaudioclient.so', 'libaudiobase.so'),
+    'system_ext/lib64/libwfdservice.so': blob_fixup()
+        .add_needed('libaudiobase.so')
+        .replace_needed('android.media.audio.common.types-V4-cpp.so',
+                        'android.media.audio.common.types-V5-cpp.so'),
+    # Retain the Lineage 24 adaptation already present in the former A17 tree:
+    # the current libcodec2_aidl_noisurface bridge uses media.c2 AIDL V2.
+    (
+        'vendor/bin/hw/vendor.qti.media.c2@1.0-service',
+        'vendor/bin/hw/vendor.qti.media.c2audio@1.0-service',
+    ): blob_fixup()
+        .replace_needed('android.hardware.media.c2-V1-ndk.so',
+                        'android.hardware.media.c2-V2-ndk.so'),
 }  # fmt: skip
 
 module = ExtractUtilsModule(
