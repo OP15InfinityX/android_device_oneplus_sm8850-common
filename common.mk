@@ -9,6 +9,11 @@ $(call inherit-product, hardware/qcom-caf/common/common.mk)
 
 # A/B
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
+# Android 17 requires userspace snapshots; legacy dm-snapshot OTAs are rejected.
+# Retain the existing vendor-ramdisk tools and use snapuserd in init_boot's
+# generic ramdisk. Enable VABC payload metadata without extra COW compression.
+$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/vabc_features.mk)
+PRODUCT_VIRTUAL_AB_COMPRESSION_METHOD := none
 
 AB_OTA_POSTINSTALL_CONFIG += \
     RUN_POSTINSTALL_system=true \
