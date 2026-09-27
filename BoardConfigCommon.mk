@@ -55,6 +55,11 @@ BOARD_RAMDISK_USE_LZ4 := true
 # Bootloader
 TARGET_BOOTLOADER_BOARD_NAME := canoe
 
+# Data / tethering
+# The 3.12 baseline provides IPACM and its matching libraries/configs as blobs.
+# Do not also export the CAF source namespace into the product.
+USE_DEVICE_SPECIFIC_DATA_IPA_CFG_MGR := true
+
 # DTB / DTBO
 BOARD_INCLUDE_DTB_IN_BOOTIMG := true
 BOARD_KERNEL_SEPARATED_DTBO := true
@@ -154,7 +159,7 @@ VENDOR_SECURITY_PATCH := $(BOOT_SECURITY_PATCH)
 # SEPolicy
 include device/qcom/sepolicy_vndr/SEPolicy.mk
 include hardware/oplus/sepolicy/qti/SEPolicy.mk
-BOARD_SEPOLICY_DIRS += $(COMMON_PATH)/sepolicy/vendor
+BOARD_VENDOR_SEPOLICY_DIRS += $(COMMON_PATH)/sepolicy/vendor
 
 # Verified Boot
 BOARD_AVB_ENABLE := true
