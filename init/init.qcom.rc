@@ -288,6 +288,12 @@ on post-fs-data
     mkdir /data/vendor/camera 0777 camera camera
     mkdir /data/vendor/camera_remote_dump 0777 root system
 
+    # OPlus app/APS state needs camera-specific labels, including after an OTA.
+    mkdir /data/vendor/cam_alog 0777 camera camera
+    mkdir /data/vendor/camera_process 0777 camera camera
+    restorecon_recursive /data/vendor/cam_alog
+    restorecon_recursive /data/vendor/camera_process
+
     #Create directory for tftp
     mkdir /data/vendor/tombstones 0771 system system
     mkdir /data/vendor/tombstones/rfs 0771 system system
