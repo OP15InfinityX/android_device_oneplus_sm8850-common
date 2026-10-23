@@ -17,6 +17,11 @@ from extract_utils.main import (
     ExtractUtilsModule,
 )
 
+from pathlib import Path
+import sys
+sys.path.append(str(Path(__file__).resolve().parents[3] / 'hardware/oplus/extract-utils-ext'))
+from extract_utils_oplus.coui_material import (blob_fixup_coui_material_capabilities, blob_fixup_coui_unpack_sources)
+
 namespace_imports = [
     'device/oneplus/sm8850-common',
     'hardware/oplus',
@@ -36,8 +41,26 @@ def lib_fixup_vendor_suffix(lib: str, partition: str, *args, **kwargs):
     return f'{lib}_{partition}' if partition == 'vendor' else None
 
 
+def lib_fixup_stock_oplus_interface(lib: str, partition: str, *args, **kwargs):
+    # Match the actual COS17 OEM ABI. Project V3 also has a different API
+    # hash from our frozen source interface despite sharing the version.
+    return f'{lib}_stock'
+
+
+def lib_fixup_cryptoeng_camera_namespace(lib: str, partition: str, *args, **kwargs):
+    # CryptoEng's ODM and system_ext prebuilts are owned by the camera tree.
+    # Select the matching partition explicitly without a namespace-import cycle.
+    suffix = '_odm' if partition == 'odm' else ''
+    return f'//vendor/oneplus/infiniti-camera:{lib}{suffix}'
+
+
 lib_fixups: lib_fixups_user_type = {
     **lib_fixups,
+    'vendor.oplus.hardware.cryptoeng-V1-ndk': lib_fixup_cryptoeng_camera_namespace,
+    (
+        'vendor.oplus.hardware.charger-V11-ndk',
+        'vendor.oplus.hardware.stability.oplus_project-V3-ndk',
+    ): lib_fixup_stock_oplus_interface,
     (
         'com.qualcomm.qti.dpm.api@1.0',
         'libosensenativeproxy_client',
@@ -55,6 +78,11 @@ lib_fixups: lib_fixups_user_type = {
 }
 
 blob_fixups: blob_fixups_user_type = {
+    'product/app/ConsumerIRApp/ConsumerIRApp.apk': blob_fixup()
+        .call(blob_fixup_coui_unpack_sources)
+        .call(blob_fixup_coui_material_capabilities)
+        .apktool_pack()
+        .stripzip(),
     'odm/bin/hw/vendor.oplus.hardware.biometrics.fingerprint@2.1-service_uff': blob_fixup()
         .add_needed('libshims_aidl_fingerprint_v3.oplus.so'),
     (
