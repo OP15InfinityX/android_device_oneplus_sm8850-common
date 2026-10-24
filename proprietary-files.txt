@@ -1285,3 +1285,16 @@ vendor/lib64/vendor.qti.hardware.wifidisplaysessionl@1.0-halimpl.so
 odm/lib64/libcryptoapis.so
 odm/lib64/vendor.oplus.hardware.stability.oplus_project-V3-ndk.so;MODULE_SUFFIX=_stock
 vendor/lib64/libopluspal_wls_charger.so
+
+# COS17 stock backfill
+vendor/etc/aidl/le_audio/aidl_default_audio_set_configurations_qti.json
+vendor/etc/aidl/le_audio/aidl_default_audio_set_scenarios_qti.json
+vendor/etc/aidl/le_audio/aidl_default_vendor_audio_set_scenarios_qti.json
+vendor/etc/sensors/config/qsh_camera_mariofront_3.json
+vendor/etc/sensors/config/qsh_camera_redalertfront_3.json
+vendor/etc/sensors/config/qsh_camera_starcraftExFront_4.json
+vendor/etc/sensors/config/qsh_camera_starcraftFront_4.json
+vendor/etc/sensors/config/qsh_camera_starcraftrfront_4.json
+vendor/etc/sv/mldfs/mldfs_dyn.dat
+vendor/lib/rfsa/adsp/location.napp_header
+vendor/lib/rfsa/adsp/location.so
