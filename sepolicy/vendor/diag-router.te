@@ -9,6 +9,8 @@ binder_call(vendor_hal_diaghal_client, vendor_hal_diaghal_server)
 binder_call(vendor_hal_diaghal_server, vendor_hal_diaghal_client)
 
 hal_attribute_hwservice(vendor_hal_diaghal, vendor_hal_diaghal_hwservice)
+hal_attribute_service(vendor_hal_diaghal, vendor_hal_diaghal_service)
+binder_call(vendor_hal_diaghal_server, servicemanager)
 
 allow vendor_diag-router functionfs:dir r_dir_perms;
 allow vendor_diag-router functionfs:file rw_file_perms;
@@ -16,6 +18,7 @@ allow vendor_diag-router functionfs:file rw_file_perms;
 allow vendor_diag-router self:qipcrtr_socket create_socket_perms_no_ioctl;
 
 allow vendor_diag-router vendor_mhi_diag_device:chr_file rw_file_perms;
+allow vendor_diag-router kmsg_device:chr_file { getattr write open };
 
 allow vendor_diag-router self:netlink_kobject_uevent_socket create_socket_perms_no_ioctl;
 
