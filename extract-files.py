@@ -83,6 +83,10 @@ lib_fixups: lib_fixups_user_type = {
 }
 
 blob_fixups: blob_fixups_user_type = {
+    'vendor/etc/perf/perfboostsconfig.xml': blob_fixup()
+        .patch_file('patches/perfboostsconfig.xml.patch'),
+    'vendor/etc/perf/perfconfigstore.xml': blob_fixup()
+        .patch_file('patches/perfconfigstore.xml.patch'),
     'vendor/etc/sensors/hals.conf': blob_fixup()
         .regex_replace(r'sensors\.qsh\.so', 'sensors.fusionlight.so'),
     'product/app/ConsumerIRApp/ConsumerIRApp.apk': blob_fixup()

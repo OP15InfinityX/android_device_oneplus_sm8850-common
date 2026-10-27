@@ -1,0 +1,9 @@
+--- a/perfconfigstore.xml
++++ b/perfconfigstore.xml
+@@ -131,5 +131,6 @@
+                 <Prop Name="vendor.enable.memperfd_MIN_RAM_in_KB" Value="1048576"  />
+                 <Prop Name="vendor.enable.memperfd_MAX_RAM_in_KB" Value="15728640" />
+                 <Prop Name="ro.vendor.wlc.exit.timeout" Value="120000"/>
++                <Prop Name="vendor.perf.expensive_rendering" Value="1" />
+     </PerfConfigs>
+ </PerfConfigsStore>
