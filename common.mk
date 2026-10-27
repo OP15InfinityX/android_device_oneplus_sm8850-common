@@ -47,40 +47,107 @@ PRODUCT_PACKAGES += \
     audio.bluetooth.default \
     audio.r_submix.default \
     audio.usb.default \
+    audioadsprpcd \
+    audiohalservice.qti \
+    customva_plugin \
+    hotword_plugin \
+    libagm_compress_plugin \
+    libagm_mixer_plugin \
+    libagm_pcm_plugin \
+    libagmipcservice \
     libalsautilsv2.vendor \
+    libaudiochargerlistener \
+    libaudioplatformconverter.qti \
     libaudioutils_shim \
     libbatterylistener \
     libbluetooth_audio_session_aidl_shim \
     libbundleaidl \
+    libdev_display \
+    libdev_dummy \
+    libdev_ec_ref \
+    libdev_ext_ec \
+    libdev_fm \
+    libdev_handset \
+    libdev_handset_mic \
+    libdev_handset_va \
+    libdev_haptics \
+    libdev_headphone \
+    libdev_headset_mic \
+    libdev_headset_va \
+    libdev_proxy \
+    libdev_speaker_mic \
+    libdev_ultrasound \
+    libdev_usb \
     libdownmixaidl \
     libdynamicsprocessingaidl \
+    libhfp_pal \
     libloudnessenhanceraidl \
     libmediautils_vendor.vendor \
     libmemunreachable.vendor \
+    libpal_sounddose \
+    libpaleventnotifier \
+    libpalipcservice \
+    libqcompostprocbundle \
+    libqcomvisualizer \
+    libqcomvoiceprocessing \
     libreverbaidl \
+    libsession_agm \
+    libsoundtriggerhal.qti \
+    libstream_acd \
+    libstream_asr \
+    libstream_calltranslation \
+    libstream_common \
+    libstream_commonproxy \
+    libstream_contextproxy \
+    libstream_dummy \
+    libstream_haptics \
+    libstream_incall \
+    libstream_nontunnel \
+    libstream_sensorpcmdata \
+    libstream_sensorrenderer \
+    libstream_soundtrigger \
+    libstream_ultrasound \
     libtinyalsav2 \
     libtinycompress \
     libv4a_aidl \
     libvisualizeraidl \
     qti-audio-types-aidl-V1-ndk.vendor \
-    qtiaudiohalvendorextn
+    qtiaudiohalvendorextn \
+    sva_plugin
+
+$(call soong_config_set,qtiaudio,extra_device_virtuals,4)
+$(call soong_config_set,qtiaudio,extra_out_devices,1)
+$(call soong_config_set,qtiaudio,extra_in_devices,1)
+$(call soong_config_set_bool,qtiaudio,nonvirtual_stream_isinitialized,true)
+$(call soong_config_set_bool,qtiaudio,no_stream_mixer_event_callback,true)
+
+# COS17 loads device-specific DSP modules from ODM, as the stock daemon does.
+$(call soong_config_set,qtiaudio,adsp_lib_directory_path,/odm/lib/rfsa)
+
+# Keep the existing effect implementation paired with the stock audio effect HAL.
+$(call soong_config_set_bool,qtiaudio,prebuilt_volume_listener,true)
 
 AUDIO_HAL_DIR := hardware/qcom-caf/sm8850/audio/primary-hal
 CONFIG_HAL_SRC_DIR := $(AUDIO_HAL_DIR)/configs/canoe
+CONFIG_PAL_SRC_DIR := $(AUDIO_HAL_DIR)/../pal/configs/qcom/mobile/canoe
 QCV_FAMILY_SKUS := alor canoe
 
 PRODUCT_COPY_FILES += \
 $(foreach DEVICE_SKU, $(QCV_FAMILY_SKUS), \
     $(CONFIG_HAL_SRC_DIR)/audio_effects.conf:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_$(DEVICE_SKU)/audio_effects.conf \
     $(CONFIG_HAL_SRC_DIR)/audio_effects.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_$(DEVICE_SKU)/audio_effects.xml \
-    $(CONFIG_HAL_SRC_DIR)/audio_effects_config.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_$(DEVICE_SKU)/audio_effects_config.xml \
+    $(CONFIG_PAL_SRC_DIR)/plugin_manager.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_$(DEVICE_SKU)/plugin_manager.xml \
+    $(LOCAL_PATH)/configs/audio/audio_effects_config.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_$(DEVICE_SKU)/audio_effects_config.xml \
     $(LOCAL_PATH)/configs/audio/audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_$(DEVICE_SKU)/audio_policy_configuration.xml)
 
 PRODUCT_COPY_FILES += \
-    $(CONFIG_HAL_SRC_DIR)/audio_effects_config.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_effects_config.xml \
+    $(LOCAL_PATH)/configs/audio/audio_effects_config.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_effects_config.xml \
     $(CONFIG_HAL_SRC_DIR)/mem_logger_config.xml:$(TARGET_COPY_OUT_VENDOR)/etc/mem_logger_config.xml \
     $(CONFIG_HAL_SRC_DIR)/microphone_characteristics.xml:$(TARGET_COPY_OUT_VENDOR)/etc/microphone_characteristics.xml \
-    $(CONFIG_HAL_SRC_DIR)/vendor_audio_interfaces.xml:$(TARGET_COPY_OUT_VENDOR)/etc/vendor_audio_interfaces.xml
+    $(CONFIG_HAL_SRC_DIR)/vendor_audio_interfaces.xml:$(TARGET_COPY_OUT_VENDOR)/etc/vendor_audio_interfaces.xml \
+    $(CONFIG_PAL_SRC_DIR)/Hapticsconfig.xml:$(TARGET_COPY_OUT_VENDOR)/etc/Hapticsconfig.xml \
+    $(CONFIG_PAL_SRC_DIR)/card-defs.xml:$(TARGET_COPY_OUT_VENDOR)/etc/card-defs.xml \
+    $(CONFIG_PAL_SRC_DIR)/usecaseKvManager.xml:$(TARGET_COPY_OUT_VENDOR)/etc/usecaseKvManager.xml
 
 PRODUCT_COPY_FILES += \
     frameworks/av/services/audiopolicy/config/r_submix_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/r_submix_audio_policy_configuration.xml \
@@ -88,12 +155,14 @@ PRODUCT_COPY_FILES += \
     frameworks/av/services/audiopolicy/config/usb_audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/usb_audio_policy_configuration.xml \
     frameworks/native/data/etc/android.hardware.audio.low_latency.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.audio.low_latency.xml \
     frameworks/native/data/etc/android.hardware.audio.pro.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.audio.pro.xml \
-    frameworks/native/data/etc/android.hardware.sensor.dynamic.head_tracker.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.dynamic.head_tracker.xml \
     frameworks/native/data/etc/android.software.midi.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.midi.xml
 
 # Bluetooth
 PRODUCT_PACKAGES += \
-    android.hardware.bluetooth.audio-impl
+    android.hardware.bluetooth.audio-impl \
+    lib_bt_aptx \
+    lib_bt_ble \
+    lib_bt_bundle
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.bluetooth.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.bluetooth.xml \

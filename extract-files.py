@@ -47,6 +47,10 @@ def lib_fixup_stock_oplus_interface(lib: str, partition: str, *args, **kwargs):
     return f'{lib}_stock'
 
 
+def lib_fixup_stock_volume_listener(lib: str, partition: str, *args, **kwargs):
+    return f'{lib}_stock' if partition == 'vendor' else None
+
+
 def lib_fixup_cryptoeng_camera_namespace(lib: str, partition: str, *args, **kwargs):
     # CryptoEng's ODM and system_ext prebuilts are owned by the camera tree.
     # Select the matching partition explicitly without a namespace-import cycle.
@@ -56,6 +60,7 @@ def lib_fixup_cryptoeng_camera_namespace(lib: str, partition: str, *args, **kwar
 
 lib_fixups: lib_fixups_user_type = {
     **lib_fixups,
+    'libvolumelistener': lib_fixup_stock_volume_listener,
     'vendor.oplus.hardware.cryptoeng-V1-ndk': lib_fixup_cryptoeng_camera_namespace,
     (
         'vendor.oplus.hardware.charger-V11-ndk',
