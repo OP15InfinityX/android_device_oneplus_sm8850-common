@@ -297,10 +297,10 @@ $(call soong_config_set,libinit,vendor_init_lib,//$(LOCAL_PATH):libinit_oplus)
 
 # IPACM
 ifneq ($(TARGET_IS_TABLET),true)
-#PRODUCT_PACKAGES += \
-#    ipacm \
-#    IPACM_cfg.xml \
-#    IPACM_Filter_cfg.xml
+PRODUCT_PACKAGES += \
+    ipacm \
+    IPACM_cfg.xml \
+    IPACM_Filter_cfg.xml
 endif
 
 # IR
