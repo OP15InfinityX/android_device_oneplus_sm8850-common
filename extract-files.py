@@ -160,6 +160,11 @@ blob_fixups: blob_fixups_user_type = {
     ): blob_fixup()
         .regex_replace('.*media_codecs_(google_audio|google_c2|google_telephony|google_video).*\n', '')
         .regex_replace('media_codecs_vendor_audio', 'media_codecs_dolby_vision'),
+    (
+        'vendor/etc/vintf/manifest/c2_manifest_vendor.xml',
+        'vendor/etc/vintf/manifest/c2_manifest_vendor_audio.xml',
+    ): blob_fixup()
+        .regex_replace(r'(<name>android.hardware.media.c2</name>)(?:\s*<version>\d+</version>)?', r'\1\n        <version>2</version>'),
     # Retain the stock audio core AIDL version (Jonas' 5709a47).
     # This 16.0.8 Bluetooth blob imports only three AudioDeviceDescription
     # constants exported by V4, which the stock audio.core-V3 also uses.
