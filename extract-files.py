@@ -135,6 +135,8 @@ blob_fixups: blob_fixups_user_type = {
         .replace_needed('vendor.oplus.hardware.subsys_radio-V1-ndk.so', 'vendor.oplus.hardware.subsys_radio-compat-V1-ndk.so'),
     'product/etc/sysconfig/com.android.hotwordenrollment.common.util.xml': blob_fixup()
         .regex_replace('/my_product', '/product'),
+    'vendor/etc/seccomp_policy/syshealthmon.policy': blob_fixup()
+        .add_line_if_missing('clock_gettime: 1'),
     'vendor/etc/init/vendor.dpmd.rc': blob_fixup()
         .regex_replace(
             r'(    group system readproc inet radio wakelock oem_2901\n)(    disabled)',
