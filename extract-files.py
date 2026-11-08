@@ -229,6 +229,8 @@ blob_fixups: blob_fixups_user_type = {
         .remove_needed('libheif.so'),
     'system_ext/lib64/libwfdmmsrc_system.so': blob_fixup()
         .replace_needed('libaudioclient.so', 'libaudiobase.so'),
+    'system_ext/lib64/libwfdavenhancements.so': blob_fixup()
+        .binary_regex_replace(b'\xe8\\\x5e\x40\xf9', b'\xe8\x5a\x40\xf9'),
     'system_ext/lib64/libwfdservice.so': blob_fixup()
         .add_needed('libaudiobase.so')
         .replace_needed('android.media.audio.common.types-V4-cpp.so',
