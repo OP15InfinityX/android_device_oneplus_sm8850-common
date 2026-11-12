@@ -82,6 +82,30 @@ lib_fixups: lib_fixups_user_type = {
     ): lib_fixup_vendor_suffix,
 }
 
+def blob_fixup_wfd_consumer_abi_guard(ctx, file, file_path, *args, **kwargs):
+    """Only patch the two verified COS17 BufferQueueConsumer usage calls."""
+    import re
+    import struct
+
+    data = Path(file_path).read_bytes()
+    if data[:6] != b'\x7fELF\x02\x01' or struct.unpack_from('<H', data, 18)[0] != 183:
+        raise ValueError('WFD compatibility fix requires a little-endian AArch64 ELF')
+    shoff = struct.unpack_from('<Q', data, 40)[0]
+    shsize, shnum, shstrndx = struct.unpack_from('<HHH', data, 58)
+    sections = [struct.unpack_from('<IIQQQQIIQQ', data, shoff + i * shsize)
+                for i in range(shnum)]
+    names_section = sections[shstrndx]
+    names = data[names_section[4]:names_section[4] + names_section[5]]
+    text = [s for s in sections if names[s[0]:].split(b'\0', 1)[0] == b'.text']
+    calls = [m.start() for m in re.finditer(re.escape(bytes.fromhex('e8 5e 40 f9')), data)]
+    # ldr x8,[x23,#0xb8]; mov x0,x21; mov x1,x22; blr x8
+    args_and_call = bytes.fromhex('e0 03 15 aa e1 03 16 aa 00 01 3f d6')
+    if (len(text) != 1 or len(calls) != 2 or any(
+            pos % 4 or not (text[0][4] <= pos and pos + 16 <= text[0][4] + text[0][5])
+            or data[pos + 4:pos + 16] != args_and_call for pos in calls)):
+        raise ValueError('Unexpected WFD BufferQueueConsumer call layout; review the new blob ABI')
+
+
 blob_fixups: blob_fixups_user_type = {
     'vendor/etc/perf/perfboostsconfig.xml': blob_fixup()
         .patch_file('patches/perfboostsconfig.xml.patch'),
@@ -230,6 +254,7 @@ blob_fixups: blob_fixups_user_type = {
     'system_ext/lib64/libwfdmmsrc_system.so': blob_fixup()
         .replace_needed('libaudioclient.so', 'libaudiobase.so'),
     'system_ext/lib64/libwfdavenhancements.so': blob_fixup()
+        .call(blob_fixup_wfd_consumer_abi_guard, need_tmp_dir=False)
         .binary_regex_replace(b'\xe8\\\x5e\x40\xf9', b'\xe8\x5a\x40\xf9'),
     'system_ext/lib64/libwfdservice.so': blob_fixup()
         .add_needed('libaudiobase.so')
