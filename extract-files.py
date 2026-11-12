@@ -21,6 +21,7 @@ from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).resolve().parents[3] / 'hardware/oplus/extract-utils-ext'))
 from extract_utils_oplus.coui_material import (blob_fixup_coui_material_capabilities, blob_fixup_coui_unpack_sources)
+from extract_utils_oplus.consumerir import blob_fixup_consumerir_sdk
 
 namespace_imports = [
     'device/oneplus/sm8850-common',
@@ -116,6 +117,7 @@ blob_fixups: blob_fixups_user_type = {
     'product/app/ConsumerIRApp/ConsumerIRApp.apk': blob_fixup()
         .call(blob_fixup_coui_unpack_sources)
         .call(blob_fixup_coui_material_capabilities)
+        .call(blob_fixup_consumerir_sdk)
         .apktool_pack()
         .stripzip(),
     'odm/bin/hw/vendor.oplus.hardware.biometrics.fingerprint@2.1-service_uff': blob_fixup()
